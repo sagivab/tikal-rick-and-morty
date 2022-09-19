@@ -1,8 +1,8 @@
-import { ChartacterEpisodes } from 'types/common';
+import { Character } from 'types/common';
 
-export const sumEpisodesNumbersForListOfCharacters = (
-  characters: ChartacterEpisodes[] | undefined,
-) => {
+export const awaitObj = { timeout: 3000 };
+
+export const sumEpisodesNumbersForListOfCharacters = (characters: Character[] | undefined) => {
   let sumOfEpisodes = 0;
 
   characters?.forEach(character => {

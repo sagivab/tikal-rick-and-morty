@@ -1,4 +1,5 @@
 import Pagination from 'components/Pagination';
+import { useGetLocationByName } from 'hooks/useCharacter';
 import usePagination from 'hooks/usePagination';
 import useWindowSize from 'hooks/useWindowSize';
 import React, { useEffect } from 'react';
@@ -10,6 +11,8 @@ type CharacterDisplayProps = {
 };
 
 export default function CharacterDisplay({ characters, title }: CharacterDisplayProps) {
+  const dimensionResponse = useGetLocationByName(characters[0]?.origin.name);
+
   const [width] = useWindowSize();
   const pageSize = width > 768 ? 3 : 1;
   const { currentPage, prevPage, nextPage, startIndex, endIndex, totalPageCount, setCurrentPage } =
@@ -23,13 +26,23 @@ export default function CharacterDisplay({ characters, title }: CharacterDisplay
     return <p> There is no character to show</p>;
   }
 
+  let dimension = '';
+
+  if (dimensionResponse.loading) {
+    dimension = 'loading...';
+  } else if (dimensionResponse.error !== '') {
+    dimension = dimensionResponse.error;
+  } else {
+    dimension = dimensionResponse.data?.results[0].dimension || '';
+  }
+
   return (
     <div className="flex flex-col gap-y-4 items-center text-emerald-100">
       <h2 className="text-xl font-bold">{title}</h2>
       <div className="flex flex-row flex-wrap justify-evenly p-2 gap-4">
         {characters.slice(startIndex, endIndex).map(character => {
           const { name, origin, episode } = character;
-          const { name: originName, dimension } = origin;
+          const { name: originName } = origin;
           const objToRender = {
             'Character name': name,
             'Origin name': originName,
@@ -38,7 +51,7 @@ export default function CharacterDisplay({ characters, title }: CharacterDisplay
           };
 
           return (
-            <table className="w-80" key={character.name}>
+            <table className="w-80 shadow-md shadow-primary" key={character.name}>
               <tbody key={character.name}>
                 {(Object.keys(objToRender) as Array<keyof typeof objToRender>).map(key => (
                   <tr key={key}>

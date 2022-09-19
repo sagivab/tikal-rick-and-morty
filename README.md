@@ -1,3 +1,11 @@
+# Run locally
+
+
+### `git clone https://github.com/sagivab/tikal-rick-and-morty.git`
+### `cd tikal-rick-and-morty`
+### `yarn install`
+### `yarn start`
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

@@ -3,8 +3,8 @@ import Barchart from 'components/Barchart';
 import CharactersDisplay from 'components/CharactersDisplay';
 import ErrorBoundary from 'components/ErrorBoundary';
 import {
-  useGetCharactersByIds,
-  useGetCharactersNumber,
+  useGetAllCharacters,
+  useGetAllCharactersByIds,
   useGetMostUnpopularCharacterByOrigin,
   useGetNumOfEpisodesByNames,
 } from 'hooks/useCharacter';
@@ -17,19 +17,21 @@ function App() {
   const originToLookFor = 'Earth (C-137)';
   const pageHeading = 'Welcome! Rick & Morty data UI';
 
-  const charactersNumberResponse = useGetCharactersNumber();
+  // Get the number of all available characters
+  const allCharactersResponse = useGetAllCharacters();
 
   // All characters IDs(array) from 1 - to the number of characters.
-  const characatersIds =
-    (charactersNumberResponse.data?.characters.info.count &&
-      generateArray(charactersNumberResponse.data.characters.info.count)) ||
+  const characatersIds: number[] =
+    (allCharactersResponse.data?.info.count &&
+      generateArray(allCharactersResponse.data?.info.count)) ||
     [];
 
-  const charactersResponse = useGetCharactersByIds(
+  const allCharactersByIdsResponse = useGetAllCharactersByIds(
     characatersIds,
-    charactersNumberResponse.loading || !charactersNumberResponse?.data?.characters.info.count,
+    allCharactersResponse.loading || allCharactersResponse.error !== '',
   );
-  const characters = charactersResponse?.data?.charactersByIds || [];
+
+  const characters = allCharactersByIdsResponse.data || [];
 
   // Get data for most unpopular from all characters array
   const charactersWithLeastEpisodes = useGetMostUnpopularCharacterByOrigin(
@@ -37,12 +39,12 @@ function App() {
     originToLookFor,
   );
 
-  // Get number of episode by name from all characters array
+  // // Get number of episode by name from all characters array
   const barchartData = useGetNumOfEpisodesByNames(characters, names);
 
-  const loading = charactersNumberResponse.loading || charactersResponse.loading;
+  const loading = allCharactersByIdsResponse.loading || allCharactersByIdsResponse.loading;
 
-  const error = charactersNumberResponse.error || charactersResponse.error;
+  const error = allCharactersByIdsResponse.error || allCharactersByIdsResponse.error;
 
   if (error) {
     return <div>Something went wrong!</div>;

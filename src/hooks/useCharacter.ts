@@ -1,55 +1,19 @@
-import { gql, useQuery } from '@apollo/client';
-import { Character, CharacterNumber, Characters, ChartactersEpisodes } from 'types/common';
+import { AllCharacters, Character, LocationType } from 'types/common';
+import useFetchData from './useFetchData';
 
-export const GET_CHARACTERS_EPISODES_AND_ORIGIN_BY_IDS = gql`
-  query GetCharactersByIds($ids: [ID!]!) {
-    charactersByIds(ids: $ids) {
-      id
-      name
-      origin {
-        name
-        dimension
-      }
-      episode {
-        id
-      }
-    }
-  }
-`;
+const allCharactersUrl = 'https://rickandmortyapi.com/api/character';
 
-export const GET_CHARACTERS_NUMBER = gql`
-  {
-    characters {
-      info {
-        count
-      }
-    }
-  }
-`;
+export const useGetLocationByName = (originName: string) => {
+  const locationUrl = 'https://rickandmortyapi.com/api/location';
+  const fullUrlRequest = `${locationUrl}?name=${encodeURIComponent(originName)}`;
 
-const GET_CHARACTER_EPISODES_BY_NAME = gql`
-  query GetCharacterByName($name: String) {
-    characters(filter: { name: $name }) {
-      results {
-        episode {
-          id
-        }
-      }
-    }
-  }
-`;
+  return useFetchData<LocationType>(fullUrlRequest);
+};
 
-export const useGetCharactersNumber = () => useQuery<CharacterNumber>(GET_CHARACTERS_NUMBER);
+export const useGetAllCharacters = () => useFetchData<AllCharacters>(allCharactersUrl);
 
-export const useGetCharactersByIds = (ids: number[] | string[], skip: boolean) =>
-  useQuery<Characters>(GET_CHARACTERS_EPISODES_AND_ORIGIN_BY_IDS, {
-    variables: { ids, skip },
-  });
-
-export const useGetCharacterEpisodesByName = (name: string) =>
-  useQuery<ChartactersEpisodes>(GET_CHARACTER_EPISODES_BY_NAME, {
-    variables: { name },
-  });
+export const useGetAllCharactersByIds = (characatersIds: number[], lazy: boolean) =>
+  useFetchData<Character[]>(`${allCharactersUrl}/${characatersIds.join()}`, lazy);
 
 export const useGetNumOfEpisodesByNames = (characters: Character[], names: string[]) =>
   names.map(name => {
